@@ -137,6 +137,8 @@ function Test-SourceFiles {
         "kiro\steering\conventions.md",
         "kiro\steering\learnings.md",
         "kiro\steering\self-review.md",
+        "kiro\steering\fswrite-rule.md",
+        "kiro\steering\builders-use-uv.md",
         "kiro\hooks\post-task-review.kiro.hook",
         "kiro\hooks\periodic-review.kiro.hook"
     )
@@ -354,7 +356,9 @@ function Install-Kiro {
     Copy-ConfigFile "kiro\steering\boundaries.md"  ".kiro\steering\boundaries.md"
     Copy-ConfigFile "kiro\steering\conventions.md"  ".kiro\steering\conventions.md"
     Copy-ConfigFile "kiro\steering\learnings.md"    ".kiro\steering\learnings.md"
-    Copy-ConfigFile "kiro\steering\self-review.md"  ".kiro\steering\self-review.md"
+    Copy-ConfigFile "kiro\steering\self-review.md"      ".kiro\steering\self-review.md"
+    Copy-ConfigFile "kiro\steering\fswrite-rule.md"     ".kiro\steering\fswrite-rule.md"
+    Copy-ConfigFile "kiro\steering\builders-use-uv.md"  ".kiro\steering\builders-use-uv.md"
 
     # Hooks
     Copy-ConfigFile "kiro\hooks\post-task-review.kiro.hook"  ".kiro\hooks\post-task-review.kiro.hook"

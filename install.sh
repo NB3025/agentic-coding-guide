@@ -106,6 +106,8 @@ validate_source() {
         "kiro/steering/conventions.md"
         "kiro/steering/learnings.md"
         "kiro/steering/self-review.md"
+        "kiro/steering/fswrite-rule.md"
+        "kiro/steering/builders-use-uv.md"
         "kiro/hooks/post-task-review.kiro.hook"
         "kiro/hooks/periodic-review.kiro.hook"
     )
@@ -294,10 +296,12 @@ install_kiro() {
     echo ""
 
     # Steering
-    copy_file "kiro/steering/boundaries.md"  ".kiro/steering/boundaries.md"
-    copy_file "kiro/steering/conventions.md"  ".kiro/steering/conventions.md"
-    copy_file "kiro/steering/learnings.md"    ".kiro/steering/learnings.md"
-    copy_file "kiro/steering/self-review.md"  ".kiro/steering/self-review.md"
+    copy_file "kiro/steering/boundaries.md"      ".kiro/steering/boundaries.md"
+    copy_file "kiro/steering/conventions.md"      ".kiro/steering/conventions.md"
+    copy_file "kiro/steering/learnings.md"        ".kiro/steering/learnings.md"
+    copy_file "kiro/steering/self-review.md"      ".kiro/steering/self-review.md"
+    copy_file "kiro/steering/fswrite-rule.md"     ".kiro/steering/fswrite-rule.md"
+    copy_file "kiro/steering/builders-use-uv.md"  ".kiro/steering/builders-use-uv.md"
 
     # Hooks
     copy_file "kiro/hooks/post-task-review.kiro.hook"  ".kiro/hooks/post-task-review.kiro.hook"
