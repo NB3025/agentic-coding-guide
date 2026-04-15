@@ -10,7 +10,7 @@
 #   -Help          도움말 표시
 #   -ShowVersion   버전 표시
 #
-# 프로젝트 경로를 생략하면 ~/Documents/builders-program-0416 을 대상으로 함
+# 프로젝트 경로를 생략하면 ~/Documents/my-project-MMDD 을 대상으로 함
 # =============================================================================
 
 [CmdletBinding()]
@@ -75,7 +75,7 @@ OPTIONS:
   -ShowVersion   Show version
 
 ARGUMENTS:
-  PROJECT_PATH   Target project directory (default: ~/Documents/builders-program-0416)
+  PROJECT_PATH   Target project directory (default: ~/Documents/my-project-MMDD)
 
 CONFLICT HANDLING:
   - Default: backs up existing files as .backup, then replaces with new version
@@ -84,7 +84,7 @@ CONFLICT HANDLING:
   - learnings.md: NEVER overwritten (protected; accumulates user data)
 
 EXAMPLES:
-  # Install into default directory (~/Documents/builders-program-0416)
+  # Install into default directory (~/Documents/my-project-MMDD)
   .\install.ps1
 
   # Install into a specific project
@@ -453,7 +453,8 @@ function Main {
 
     # 대상 디렉토리 결정
     if ([string]::IsNullOrWhiteSpace($ProjectPath)) {
-        $ProjectPath = Join-Path ([Environment]::GetFolderPath("MyDocuments")) "builders-program-0416"
+        $mmdd = (Get-Date).ToString("MMdd")
+        $ProjectPath = Join-Path ([Environment]::GetFolderPath("MyDocuments")) "my-project-$mmdd"
     }
     if (-not (Test-Path $ProjectPath)) {
         Write-Info "프로젝트 디렉토리를 생성합니다: $ProjectPath"

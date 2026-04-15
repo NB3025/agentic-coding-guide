@@ -4,7 +4,7 @@
 # 사용법:
 #   .\install-aidlc.ps1 [프로젝트_경로]
 #
-# 프로젝트 경로를 생략하면 ~/Documents/builders-program-0416 을 대상으로 함
+# 프로젝트 경로를 생략하면 ~/Documents/my-project-MMDD 을 대상으로 함
 # aidlc-workflows 저장소는 ~/Documents/ 에 클론됨
 # =============================================================================
 
@@ -36,9 +36,10 @@ function Write-Fatal {
 # --- 메인 -------------------------------------------------------------------
 
 function Main {
-    # 기본 경로: ~/Documents/builders-program-0416
+    # 기본 경로: ~/Documents/my-project-MMDD
     if ([string]::IsNullOrWhiteSpace($ProjectPath)) {
-        $ProjectPath = Join-Path ([Environment]::GetFolderPath("MyDocuments")) "builders-program-0416"
+        $mmdd = (Get-Date).ToString("MMdd")
+        $ProjectPath = Join-Path ([Environment]::GetFolderPath("MyDocuments")) "my-project-$mmdd"
     }
 
     # 프로젝트 디렉토리 없으면 생성

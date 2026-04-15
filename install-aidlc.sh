@@ -5,7 +5,7 @@
 # 사용법:
 #   ./install-aidlc.sh [프로젝트_경로]
 #
-# 프로젝트 경로를 생략하면 ~/Documents/builders-program-0416 을 대상으로 함
+# 프로젝트 경로를 생략하면 ~/Documents/my-project-MMDD 을 대상으로 함
 # aidlc-workflows 저장소는 ~/Documents/ 에 클론됨
 # =============================================================================
 
@@ -31,7 +31,9 @@ die()   { err "$@"; exit 1; }
 
 # --- 메인 -------------------------------------------------------------------
 main() {
-    local default_dir="${HOME}/Documents/builders-program-0416"
+    local mmdd
+    mmdd="$(date +%m%d)"
+    local default_dir="${HOME}/Documents/my-project-${mmdd}"
     local project_dir="${1:-$default_dir}"
 
     # 절대 경로로 변환

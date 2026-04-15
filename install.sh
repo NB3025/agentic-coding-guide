@@ -11,7 +11,7 @@
 #   --help, -h      도움말 표시
 #   --version, -v   버전 표시
 #
-# 프로젝트 경로를 생략하면 ~/Documents/builders-program-0416 을 대상으로 함
+# 프로젝트 경로를 생략하면 ~/Documents/my-project-MMDD 을 대상으로 함
 # =============================================================================
 
 set -euo pipefail
@@ -385,7 +385,7 @@ OPTIONS:
   --version, -v   Show version
 
 ARGUMENTS:
-  PROJECT_PATH    Target project directory (default: ~/Documents/builders-program-0416)
+  PROJECT_PATH    Target project directory (default: ~/Documents/my-project-MMDD)
 
 CONFLICT HANDLING:
   - Default: backs up existing files as .backup, then replaces with new version
@@ -394,7 +394,7 @@ CONFLICT HANDLING:
   - learnings.md: NEVER overwritten (protected; accumulates user data)
 
 EXAMPLES:
-  # Install into default directory (~/Documents/builders-program-0416)
+  # Install into default directory (~/Documents/my-project-MMDD)
   ./install.sh
 
   # Install into a specific project
@@ -436,7 +436,9 @@ parse_args() {
         die "프로젝트 경로는 하나만 지정할 수 있습니다."
     fi
 
-    local default_dir="${HOME}/Documents/builders-program-0416"
+    local mmdd
+    mmdd="$(date +%m%d)"
+    local default_dir="${HOME}/Documents/my-project-${mmdd}"
     TARGET_DIR="${positional_args[0]:-$default_dir}"
 }
 
