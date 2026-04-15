@@ -1,26 +1,20 @@
 ﻿# =============================================================================
-# install.ps1 - Agentic Coding Guide 설치 스크립트 (PowerShell)
+# install.ps1 - Agentic Coding Guide 설치 스크립트 (Kiro)
 #
 # 사용법:
 #   .\install.ps1 [옵션] [프로젝트_경로]
 #
 # 옵션:
-#   -Kiro          Kiro 설정 파일만 설치
-#   -ClaudeCode    Claude Code 설정 파일만 설치
-#   -All           모든 설정 파일 설치
 #   -DryRun        실제 복사 없이 미리보기
 #   -Force         기존 파일 백업 없이 덮어쓰기
 #   -Help          도움말 표시
+#   -ShowVersion   버전 표시
 #
 # 프로젝트 경로를 생략하면 현재 디렉토리를 대상으로 함
-# 플래그를 생략하면 대화형 메뉴 표시
 # =============================================================================
 
 [CmdletBinding()]
 param(
-    [switch]$Kiro,
-    [switch]$ClaudeCode,
-    [switch]$All,
     [switch]$DryRun,
     [switch]$Force,
     [switch]$Help,
@@ -32,7 +26,7 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
-$script:AppVersion = "2.1.0"
+$script:AppVersion = "2.2.0"
 
 # --- 색상 출력 헬퍼 ---------------------------------------------------------
 
@@ -53,8 +47,6 @@ function Write-Fatal {
 
 $script:ScriptDir    = Split-Path -Parent $MyInvocation.MyCommand.Path
 $script:TargetDir    = ""
-$script:InstallKiro  = $false
-$script:InstallClaude = $false
 
 # 결과 카운터
 $script:CountCopied    = 0
@@ -77,9 +69,6 @@ Usage:
   .\install.ps1 [OPTIONS] [PROJECT_PATH]
 
 OPTIONS:
-  -Kiro          Install Kiro config only (.kiro\steering, .kiro\hooks)
-  -ClaudeCode    Install Claude Code config only (CLAUDE.md, .claude\learnings.md)
-  -All           Install both Kiro + Claude Code
   -DryRun        Preview what would be done without making changes
   -Force         Overwrite existing files without backup
   -Help          Show this help message
@@ -95,30 +84,25 @@ CONFLICT HANDLING:
   - learnings.md: NEVER overwritten (protected; accumulates user data)
 
 EXAMPLES:
-  # Interactive install into current directory (shows menu)
+  # Install into current directory
   .\install.ps1
 
-  # Install everything into a specific project
-  .\install.ps1 -All C:\projects\my-app
+  # Install into a specific project
+  .\install.ps1 C:\projects\my-app
 
   # Preview only (no file changes)
-  .\install.ps1 -All -DryRun C:\projects\my-app
+  .\install.ps1 -DryRun C:\projects\my-app
 
   # Overwrite without backup
-  .\install.ps1 -Kiro -Force C:\projects\my-app
+  .\install.ps1 -Force C:\projects\my-app
 
 FILES INSTALLED:
-  -Kiro:
-    .kiro\steering\boundaries.md
-    .kiro\steering\conventions.md
-    .kiro\steering\self-review.md
-    .kiro\steering\learnings.md     (protected: never overwrites existing)
-    .kiro\hooks\post-task-review.kiro.hook
-    .kiro\hooks\periodic-review.kiro.hook
-
-  -ClaudeCode:
-    CLAUDE.md
-    .claude\learnings.md            (protected: never overwrites existing)
+  .kiro\steering\boundaries.md
+  .kiro\steering\conventions.md
+  .kiro\steering\self-review.md
+  .kiro\steering\learnings.md     (protected: never overwrites existing)
+  .kiro\hooks\post-task-review.kiro.hook
+  .kiro\hooks\periodic-review.kiro.hook
 "@
 }
 
@@ -148,34 +132,18 @@ function Test-FilesIdentical {
 
 function Test-SourceFiles {
     $missing = @()
-
-    if ($script:InstallKiro) {
-        $kiroFiles = @(
-            "kiro\steering\boundaries.md",
-            "kiro\steering\conventions.md",
-            "kiro\steering\learnings.md",
-            "kiro\steering\self-review.md",
-            "kiro\hooks\post-task-review.kiro.hook",
-            "kiro\hooks\periodic-review.kiro.hook"
-        )
-        foreach ($f in $kiroFiles) {
-            $fullPath = Join-Path $script:ScriptDir $f
-            if (-not (Test-Path $fullPath)) {
-                $missing += $f
-            }
-        }
-    }
-
-    if ($script:InstallClaude) {
-        $claudeFiles = @(
-            "claude-code\CLAUDE.md",
-            "claude-code\learnings.md"
-        )
-        foreach ($f in $claudeFiles) {
-            $fullPath = Join-Path $script:ScriptDir $f
-            if (-not (Test-Path $fullPath)) {
-                $missing += $f
-            }
+    $kiroFiles = @(
+        "kiro\steering\boundaries.md",
+        "kiro\steering\conventions.md",
+        "kiro\steering\learnings.md",
+        "kiro\steering\self-review.md",
+        "kiro\hooks\post-task-review.kiro.hook",
+        "kiro\hooks\periodic-review.kiro.hook"
+    )
+    foreach ($f in $kiroFiles) {
+        $fullPath = Join-Path $script:ScriptDir $f
+        if (-not (Test-Path $fullPath)) {
+            $missing += $f
         }
     }
 
@@ -226,7 +194,7 @@ function Test-SelfInstall {
         Write-Err "이 저장소 자체에는 설치할 수 없습니다."
         Write-Err "대상 프로젝트 경로를 인자로 전달하세요."
         Write-Host ""
-        Write-Host "    예: .\install.ps1 -All C:\path\to\my-project"
+        Write-Host "    예: .\install.ps1 C:\path\to\my-project"
         exit 1
     }
 }
@@ -393,40 +361,6 @@ function Install-Kiro {
     Copy-ConfigFile "kiro\hooks\periodic-review.kiro.hook"    ".kiro\hooks\periodic-review.kiro.hook"
 }
 
-# --- Claude Code 설치 -------------------------------------------------------
-
-function Install-ClaudeCode {
-    Write-Host ""
-    Write-Host "  -- Claude Code 설정 파일 --" -ForegroundColor White
-    Write-Host ""
-
-    Copy-ConfigFile "claude-code\CLAUDE.md"       "CLAUDE.md"
-    Copy-ConfigFile "claude-code\learnings.md"    ".claude\learnings.md"
-}
-
-# --- 대화형 메뉴 ------------------------------------------------------------
-
-function Select-Interactive {
-    Write-Host ""
-    Write-Host "  설치할 항목을 선택하세요:" -ForegroundColor White
-    Write-Host ""
-    Write-Host "    1) Kiro          -- .kiro\steering, .kiro\hooks"
-    Write-Host "    2) Claude Code   -- CLAUDE.md, .claude\learnings.md"
-    Write-Host "    3) 모두 설치     -- Kiro + Claude Code"
-    Write-Host "    q) 취소"
-    Write-Host ""
-
-    $choice = Read-Host "  선택 (1/2/3/q)"
-
-    switch ($choice) {
-        "1" { $script:InstallKiro = $true }
-        "2" { $script:InstallClaude = $true }
-        "3" { $script:InstallKiro = $true; $script:InstallClaude = $true }
-        { $_ -in "q", "Q" } { Write-Info "설치를 취소합니다."; exit 0 }
-        default { Write-Fatal "잘못된 선택입니다: $choice" }
-    }
-}
-
 # --- .gitignore 힌트 --------------------------------------------------------
 
 function Show-GitignoreHint {
@@ -434,28 +368,12 @@ function Show-GitignoreHint {
     if (-not (Test-Path $gitignore)) { return }
 
     $content = Get-Content $gitignore -Raw -ErrorAction SilentlyContinue
-    $suggestions = @()
-
-    if ($script:InstallKiro) {
-        if ($content -notmatch '\.kiro/steering/learnings\.md') {
-            $suggestions += ".kiro/steering/learnings.md"
-        }
-    }
-
-    if ($script:InstallClaude) {
-        if ($content -notmatch '\.claude/learnings\.md') {
-            $suggestions += ".claude/learnings.md"
-        }
-    }
-
-    if ($suggestions.Count -gt 0) {
+    if ($content -notmatch '\.kiro/steering/learnings\.md') {
         Write-Host ""
         Write-Host "  [참고] " -ForegroundColor Yellow -NoNewline
         Write-Host "learnings.md는 개인 학습 기록입니다."
         Write-Host "        팀 프로젝트라면 .gitignore에 추가를 고려하세요:"
-        foreach ($s in $suggestions) {
-            Write-Host "        echo '$s' >> .gitignore"
-        }
+        Write-Host "        echo '.kiro/steering/learnings.md' >> .gitignore"
     }
 }
 
@@ -486,14 +404,8 @@ function Show-Summary {
     if (-not $DryRun -and $script:CountCopied -gt 0) {
         Write-Host ""
         Write-Host "  다음 단계:" -ForegroundColor White
-        if ($script:InstallKiro) {
-            Write-Host "    - .kiro\steering\conventions.md 에서 기술 스택을 프로젝트에 맞게 수정"
-            Write-Host "    - .kiro\steering\boundaries.md 에서 프로젝트별 규칙 추가"
-        }
-        if ($script:InstallClaude) {
-            Write-Host "    - CLAUDE.md 에서 Stack 섹션을 프로젝트에 맞게 수정"
-            Write-Host "    - .claude\learnings.md 는 에이전트가 자동으로 학습을 축적합니다"
-        }
+        Write-Host "    - .kiro\steering\conventions.md 에서 기술 스택을 프로젝트에 맞게 수정"
+        Write-Host "    - .kiro\steering\boundaries.md 에서 프로젝트별 규칙 추가"
     }
 
     if ($DryRun) {
@@ -508,14 +420,8 @@ function Show-Summary {
     # 참고 문서
     Write-Host ""
     Write-Host "  자세한 사용법:"
-    if ($script:InstallKiro) {
-        Write-Host "    - Kiro:        " -NoNewline
-        Write-Host "$($script:ScriptDir)\kiro\README.md" -ForegroundColor Cyan
-    }
-    if ($script:InstallClaude) {
-        Write-Host "    - Claude Code: " -NoNewline
-        Write-Host "$($script:ScriptDir)\claude-code\README.md" -ForegroundColor Cyan
-    }
+    Write-Host "    - Kiro: " -NoNewline
+    Write-Host "$($script:ScriptDir)\kiro\README.md" -ForegroundColor Cyan
     Write-Host ""
 }
 
@@ -525,10 +431,6 @@ function Main {
     # 도움말 / 버전
     if ($Help) { Show-Help; return }
     if ($ShowVersion) { Write-Host "install.ps1 v$($script:AppVersion)"; return }
-
-    # 플래그 반영
-    if ($Kiro -or $All) { $script:InstallKiro = $true }
-    if ($ClaudeCode -or $All) { $script:InstallClaude = $true }
 
     # 헤더
     Write-Host ""
@@ -563,17 +465,11 @@ function Main {
     # 디스크 공간 확인
     Test-DiskSpace
 
-    # 플래그가 없으면 대화형 메뉴
-    if (-not $script:InstallKiro -and -not $script:InstallClaude) {
-        Select-Interactive
-    }
-
     # 소스 파일 검증
     Test-SourceFiles
 
     # 설치 실행
-    if ($script:InstallKiro)  { Install-Kiro }
-    if ($script:InstallClaude) { Install-ClaudeCode }
+    Install-Kiro
 
     # 결과 요약
     Show-Summary
