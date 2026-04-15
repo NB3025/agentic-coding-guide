@@ -49,72 +49,25 @@ AI 코딩 에이전트(Kiro, Claude Code, Cursor 등)를 **자기 개선(self-im
 | Cursor | .cursorrules + 자동화 | 🔜 예정 |
 | Windsurf | .windsurfrules | 🔜 예정 |
 
-### 자동 설치 (권장)
-
-레포를 클론한 뒤, 설치 스크립트를 실행하면 대상 프로젝트에 자동으로 파일이 복사됩니다.
-
-**Bash (macOS/Linux)**
-```bash
-git clone https://github.com/NB3025/agentic-coding-guide.git
-cd agentic-coding-guide
-
-# 대화형 설치 (메뉴에서 선택)
-./install.sh /path/to/my-project
-
-# 또는 옵션 지정
-./install.sh --all /path/to/my-project        # Kiro + Claude Code 모두 설치
-./install.sh --kiro /path/to/my-project        # Kiro만 설치
-./install.sh --claude-code /path/to/my-project # Claude Code만 설치
-./install.sh --all --dry-run /path/to/my-project  # 미리보기 (변경 없음)
-```
-
-**PowerShell (Windows)**
-```powershell
-git clone https://github.com/NB3025/agentic-coding-guide.git
-cd agentic-coding-guide
-
-# 대화형 설치 (메뉴에서 선택)
-.\install.ps1 C:\path\to\my-project
-
-# 또는 옵션 지정
-.\install.ps1 -All C:\path\to\my-project        # Kiro + Claude Code 모두 설치
-.\install.ps1 -Kiro C:\path\to\my-project        # Kiro만 설치
-.\install.ps1 -ClaudeCode C:\path\to\my-project  # Claude Code만 설치
-.\install.ps1 -All -DryRun C:\path\to\my-project # 미리보기 (변경 없음)
-```
-
-#### 설치 스크립트 특징
-
-- **멱등성**: 동일한 파일은 자동 건너뜀 (여러 번 실행해도 안전)
-- **보호 파일**: `learnings.md`는 사용자 학습 데이터가 축적되므로 절대 덮어쓰지 않음
-- **백업**: 기존 파일이 다르면 `.backup`으로 백업 후 덮어쓰기 (`--force`로 백업 없이 덮어쓰기 가능)
-- **미리보기**: `--dry-run` / `-DryRun`으로 실제 변경 없이 계획만 확인
-- **대화형 메뉴**: 플래그 없이 실행하면 설치 항목 선택 메뉴 표시
-
-### 수동 설치
-
-<details>
-<summary>스크립트 없이 직접 파일을 복사하려면 클릭</summary>
-
-#### Kiro 사용자
+### Kiro 사용자
 
 ```bash
+git clone https://github.com/NB3025/agentic-coding-guide.git
 cd /path/to/my-project
 mkdir -p .kiro/steering .kiro/hooks
 cp -r /path/to/agentic-coding-guide/kiro/steering/* .kiro/steering/
 cp /path/to/agentic-coding-guide/kiro/hooks/*.kiro.hook .kiro/hooks/
 ```
 
-#### Claude Code 사용자
+### Claude Code 사용자
 
 ```bash
+git clone https://github.com/NB3025/agentic-coding-guide.git
 cd /path/to/my-project
 cp /path/to/agentic-coding-guide/claude-code/CLAUDE.md ./CLAUDE.md
 mkdir -p .claude
 cp /path/to/agentic-coding-guide/claude-code/learnings.md .claude/learnings.md
 ```
-
-</details>
 
 ## Deep Dive — 연구 문서
 
