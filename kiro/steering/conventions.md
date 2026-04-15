@@ -17,6 +17,18 @@
 - `git status`로 현재 상태 확인
 - `.kiro/steering/learnings.md` 있으면 최근 학습 참조
 
+## 역할 분리
+
+## CLI 대화형 명령어 처리 규칙
+- 대화형 프롬프트가 발생할 수 있는 CLI 명령어는 항상 `echo "y" |`를 앞에 붙여 실행한다
+- 예시: `echo "y" | npm create vite@latest frontend -- --template react-ts`
+- 적용 대상: `npm create`, `npx create-*`, `git` 등 사용자 입력을 요구할 수 있는 모든 명령어
+- 이유: 자동화 환경에서 대화형 프롬프트는 실행을 블로킹하므로 반드시 우회해야 한다
+
+## AI Agent SDK
+- Bedrock Agent는 사용하지 않음
+- 대신 Strands-Agents SDK를 사용
+
 ## 기술 스택 (#11 Stack Declaration)
 <!-- 프로젝트에 맞게 수정하세요 -->
 - Language: (여기에 작성)
