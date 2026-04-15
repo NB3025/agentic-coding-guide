@@ -51,7 +51,8 @@ AI 코딩 에이전트(Kiro, Claude Code, Cursor 등)를 **자기 개선(self-im
 
 ### Kiro 사용자
 ```bash
-cp -r kiro/steering/ .kiro/steering/
+mkdir -p .kiro/steering .kiro/hooks
+cp -r kiro/steering/* .kiro/steering/
 cp kiro/hooks/*.kiro.hook .kiro/hooks/
 ```
 
