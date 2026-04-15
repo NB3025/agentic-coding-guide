@@ -51,14 +51,28 @@ AI 코딩 에이전트(Kiro, Claude Code, Cursor 등)를 **자기 개선(self-im
 
 ### Kiro 사용자
 ```bash
+# 1. 레포 클론 (한 번만)
+git clone https://github.com/NB3025/agentic-coding-guide.git
+
+# 2. 내 프로젝트로 이동
+cd /path/to/my-project
+
+# 3. 파일 복사
 mkdir -p .kiro/steering .kiro/hooks
-cp -r kiro/steering/* .kiro/steering/
-cp kiro/hooks/*.kiro.hook .kiro/hooks/
+cp -r /path/to/agentic-coding-guide/kiro/steering/* .kiro/steering/
+cp /path/to/agentic-coding-guide/kiro/hooks/*.kiro.hook .kiro/hooks/
 ```
 
 ### Claude Code 사용자
 ```bash
-cp claude-code/CLAUDE.md ./CLAUDE.md
+# 1. 레포 클론 (한 번만)
+git clone https://github.com/NB3025/agentic-coding-guide.git
+
+# 2. 내 프로젝트로 이동
+cd /path/to/my-project
+
+# 3. 파일 복사
+cp /path/to/agentic-coding-guide/claude-code/CLAUDE.md ./CLAUDE.md
 # 프로젝트에 맞게 수정
 ```
 
