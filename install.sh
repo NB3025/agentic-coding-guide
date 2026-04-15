@@ -1,26 +1,22 @@
 #!/usr/bin/env bash
 # =============================================================================
-# install.sh - Agentic Coding Guide 설치 스크립트
+# install.sh - Agentic Coding Guide 설치 스크립트 (Kiro)
 #
 # 사용법:
 #   ./install.sh [옵션] [프로젝트_경로]
 #
 # 옵션:
-#   --kiro          Kiro 설정 파일만 설치
-#   --claude-code   Claude Code 설정 파일만 설치
-#   --all           모든 설정 파일 설치
 #   --dry-run       실제 복사 없이 미리보기
 #   --force         기존 파일 백업 없이 덮어쓰기
 #   --help, -h      도움말 표시
 #   --version, -v   버전 표시
 #
 # 프로젝트 경로를 생략하면 현재 디렉토리를 대상으로 함
-# 플래그를 생략하면 대화형 메뉴 표시
 # =============================================================================
 
 set -euo pipefail
 
-readonly VERSION="2.1.0"
+readonly VERSION="2.2.0"
 
 # --- 스크립트 소스 디렉토리 결정 (심볼릭 링크 해결) -------------------------
 resolve_script_dir() {
@@ -57,8 +53,6 @@ die()   { err "$@"; exit 1; }
 
 # --- 전역 상태 --------------------------------------------------------------
 TARGET_DIR=""
-INSTALL_KIRO=false
-INSTALL_CLAUDE=false
 DRY_RUN=false
 FORCE=false
 
@@ -107,30 +101,17 @@ is_protected() {
 # --- 소스 파일 검증 ---------------------------------------------------------
 validate_source() {
     local missing=()
-
-    if $INSTALL_KIRO; then
-        local kiro_files=(
-            "kiro/steering/boundaries.md"
-            "kiro/steering/conventions.md"
-            "kiro/steering/learnings.md"
-            "kiro/steering/self-review.md"
-            "kiro/hooks/post-task-review.kiro.hook"
-            "kiro/hooks/periodic-review.kiro.hook"
-        )
-        for f in "${kiro_files[@]}"; do
-            [[ -f "$SCRIPT_DIR/$f" ]] || missing+=("$f")
-        done
-    fi
-
-    if $INSTALL_CLAUDE; then
-        local claude_files=(
-            "claude-code/CLAUDE.md"
-            "claude-code/learnings.md"
-        )
-        for f in "${claude_files[@]}"; do
-            [[ -f "$SCRIPT_DIR/$f" ]] || missing+=("$f")
-        done
-    fi
+    local kiro_files=(
+        "kiro/steering/boundaries.md"
+        "kiro/steering/conventions.md"
+        "kiro/steering/learnings.md"
+        "kiro/steering/self-review.md"
+        "kiro/hooks/post-task-review.kiro.hook"
+        "kiro/hooks/periodic-review.kiro.hook"
+    )
+    for f in "${kiro_files[@]}"; do
+        [[ -f "$SCRIPT_DIR/$f" ]] || missing+=("$f")
+    done
 
     if [[ ${#missing[@]} -gt 0 ]]; then
         err "소스 파일이 누락되었습니다:"
@@ -167,7 +148,7 @@ check_self_install() {
         err "이 저장소 자체에는 설치할 수 없습니다."
         err "대상 프로젝트 경로를 인자로 전달하세요."
         echo ""
-        echo "    예: $0 --all /path/to/my-project"
+        echo "    예: $0 /path/to/my-project"
         exit 1
     fi
 }
@@ -320,62 +301,16 @@ install_kiro() {
     copy_file "kiro/hooks/periodic-review.kiro.hook"    ".kiro/hooks/periodic-review.kiro.hook"
 }
 
-# --- Claude Code 설치 -------------------------------------------------------
-install_claude_code() {
-    echo ""
-    echo "  ${BOLD}-- Claude Code 설정 파일 --${RESET}"
-    echo ""
-
-    copy_file "claude-code/CLAUDE.md"       "CLAUDE.md"
-    copy_file "claude-code/learnings.md"    ".claude/learnings.md"
-}
-
-# --- 대화형 메뉴 ------------------------------------------------------------
-select_interactive() {
-    echo ""
-    echo "  ${BOLD}설치할 항목을 선택하세요:${RESET}"
-    echo ""
-    echo "    ${BOLD}1)${RESET} Kiro          -- .kiro/steering, .kiro/hooks"
-    echo "    ${BOLD}2)${RESET} Claude Code   -- CLAUDE.md, .claude/learnings.md"
-    echo "    ${BOLD}3)${RESET} 모두 설치     -- Kiro + Claude Code"
-    echo "    ${BOLD}q)${RESET} 취소"
-    echo ""
-    echo -n "  선택 (1/2/3/q): "
-    read -r choice
-
-    case "$choice" in
-        1) INSTALL_KIRO=true ;;
-        2) INSTALL_CLAUDE=true ;;
-        3) INSTALL_KIRO=true; INSTALL_CLAUDE=true ;;
-        q|Q) info "설치를 취소합니다."; exit 0 ;;
-        *) die "잘못된 선택입니다: $choice" ;;
-    esac
-}
-
 # --- .gitignore 힌트 --------------------------------------------------------
 suggest_gitignore() {
     local gitignore="$TARGET_DIR/.gitignore"
     [[ -f "$gitignore" ]] || return 0
 
-    local suggestions=()
-
-    if $INSTALL_KIRO; then
-        grep -q '\.kiro/steering/learnings\.md' "$gitignore" 2>/dev/null \
-            || suggestions+=(".kiro/steering/learnings.md")
-    fi
-
-    if $INSTALL_CLAUDE; then
-        grep -q '\.claude/learnings\.md' "$gitignore" 2>/dev/null \
-            || suggestions+=(".claude/learnings.md")
-    fi
-
-    if [[ ${#suggestions[@]} -gt 0 ]]; then
+    if ! grep -q '\.kiro/steering/learnings\.md' "$gitignore" 2>/dev/null; then
         echo ""
         echo "  ${YELLOW}[참고]${RESET} learnings.md는 개인 학습 기록입니다."
         echo "        팀 프로젝트라면 .gitignore에 추가를 고려하세요:"
-        for s in "${suggestions[@]}"; do
-            echo "        echo '$s' >> .gitignore"
-        done
+        echo "        echo '.kiro/steering/learnings.md' >> .gitignore"
     fi
 }
 
@@ -408,14 +343,8 @@ print_summary() {
     if ! $DRY_RUN && [[ $COUNT_COPIED -gt 0 ]]; then
         echo ""
         echo "  ${BOLD}다음 단계:${RESET}"
-        if $INSTALL_KIRO; then
-            echo "    - .kiro/steering/conventions.md 에서 기술 스택을 프로젝트에 맞게 수정"
-            echo "    - .kiro/steering/boundaries.md 에서 프로젝트별 규칙 추가"
-        fi
-        if $INSTALL_CLAUDE; then
-            echo "    - CLAUDE.md 에서 Stack 섹션을 프로젝트에 맞게 수정"
-            echo "    - .claude/learnings.md 는 에이전트가 자동으로 학습을 축적합니다"
-        fi
+        echo "    - .kiro/steering/conventions.md 에서 기술 스택을 프로젝트에 맞게 수정"
+        echo "    - .kiro/steering/boundaries.md 에서 프로젝트별 규칙 추가"
     fi
 
     if $DRY_RUN; then
@@ -430,26 +359,18 @@ print_summary() {
     # 참고 문서
     echo ""
     echo "  자세한 사용법:"
-    if $INSTALL_KIRO; then
-        echo "    - Kiro:        ${CYAN}${SCRIPT_DIR}/kiro/README.md${RESET}"
-    fi
-    if $INSTALL_CLAUDE; then
-        echo "    - Claude Code: ${CYAN}${SCRIPT_DIR}/claude-code/README.md${RESET}"
-    fi
+    echo "    - Kiro: ${CYAN}${SCRIPT_DIR}/kiro/README.md${RESET}"
     echo ""
 }
 
-# --- 도움말 (English) ------------------------------------------------------
+# --- 도움말 -----------------------------------------------------------------
 show_help() {
     cat <<'EOF'
 Usage: install.sh [OPTIONS] [PROJECT_PATH]
 
-Install agentic-coding-guide config files into your project.
+Install Kiro config files (.kiro/steering, .kiro/hooks) into your project.
 
 OPTIONS:
-  --kiro          Install Kiro config only (.kiro/steering, .kiro/hooks)
-  --claude-code   Install Claude Code config only (CLAUDE.md, .claude/learnings.md)
-  --all           Install both Kiro + Claude Code
   --dry-run       Preview what would be done without making changes
   --force         Overwrite existing files without backup
   --backup, -b    Backup existing files before overwriting (default behavior)
@@ -466,30 +387,25 @@ CONFLICT HANDLING:
   - learnings.md: NEVER overwritten (protected; accumulates user data)
 
 EXAMPLES:
-  # Interactive install into current directory (shows menu)
+  # Install into current directory
   cd /my/project && /path/to/install.sh
 
-  # Install everything into a specific project
-  ./install.sh --all /path/to/my-project
+  # Install into a specific project
+  ./install.sh /path/to/my-project
 
   # Preview only (no file changes)
-  ./install.sh --all --dry-run /path/to/my-project
+  ./install.sh --dry-run /path/to/my-project
 
   # Overwrite without backup
-  ./install.sh --kiro --force /path/to/my-project
+  ./install.sh --force /path/to/my-project
 
 FILES INSTALLED:
-  --kiro:
-    .kiro/steering/boundaries.md
-    .kiro/steering/conventions.md
-    .kiro/steering/self-review.md
-    .kiro/steering/learnings.md     (protected: never overwrites existing)
-    .kiro/hooks/post-task-review.kiro.hook
-    .kiro/hooks/periodic-review.kiro.hook
-
-  --claude-code:
-    CLAUDE.md
-    .claude/learnings.md            (protected: never overwrites existing)
+  .kiro/steering/boundaries.md
+  .kiro/steering/conventions.md
+  .kiro/steering/self-review.md
+  .kiro/steering/learnings.md     (protected: never overwrites existing)
+  .kiro/hooks/post-task-review.kiro.hook
+  .kiro/hooks/periodic-review.kiro.hook
 EOF
 }
 
@@ -499,9 +415,6 @@ parse_args() {
 
     while [[ $# -gt 0 ]]; do
         case "$1" in
-            --kiro)         INSTALL_KIRO=true;  shift ;;
-            --claude-code)  INSTALL_CLAUDE=true; shift ;;
-            --all)          INSTALL_KIRO=true; INSTALL_CLAUDE=true; shift ;;
             --dry-run)      DRY_RUN=true;  shift ;;
             --force)        FORCE=true;    shift ;;
             --backup|-b)    shift ;;  # backup is the default behavior; flag accepted for clarity
@@ -560,21 +473,11 @@ main() {
     # 디스크 공간 확인
     check_disk_space
 
-    # 플래그가 없으면 대화형 메뉴
-    if ! $INSTALL_KIRO && ! $INSTALL_CLAUDE; then
-        select_interactive
-    fi
-
     # 소스 파일 검증
     validate_source
 
     # 설치 실행
-    if $INSTALL_KIRO; then
-        install_kiro
-    fi
-    if $INSTALL_CLAUDE; then
-        install_claude_code
-    fi
+    install_kiro
 
     # 결과 요약
     print_summary
