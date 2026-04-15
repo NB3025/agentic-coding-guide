@@ -50,6 +50,8 @@ AI 코딩 에이전트(Kiro, Claude Code, Cursor 등)를 **자기 개선(self-im
 | Windsurf | .windsurfrules | 🔜 예정 |
 
 ### Kiro 사용자
+
+**Bash (macOS/Linux)**
 ```bash
 # 1. 레포 클론 (한 번만)
 git clone https://github.com/NB3025/agentic-coding-guide.git
@@ -63,7 +65,22 @@ cp -r /path/to/agentic-coding-guide/kiro/steering/* .kiro/steering/
 cp /path/to/agentic-coding-guide/kiro/hooks/*.kiro.hook .kiro/hooks/
 ```
 
+**PowerShell (Windows)**
+```powershell
+# 1. 레포 클론 (한 번만)
+git clone https://github.com/NB3025/agentic-coding-guide.git
+
+# 2. 내 프로젝트로 이동
+cd C:\path\to\my-project
+
+# 3. 파일 복사
+New-Item -ItemType Directory -Force -Path .kiro\steering, .kiro\hooks
+Copy-Item -Recurse C:\path\to\agentic-coding-guide\kiro\steering\* .kiro\steering\
+Copy-Item C:\path\to\agentic-coding-guide\kiro\hooks\*.kiro.hook .kiro\hooks\
+```
+
 ### Claude Code 사용자
+
 ```bash
 # 1. 레포 클론 (한 번만)
 git clone https://github.com/NB3025/agentic-coding-guide.git
