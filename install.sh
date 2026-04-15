@@ -22,7 +22,7 @@ set -euo pipefail
 
 readonly VERSION="2.1.0"
 
-# ─── 스크립트 소스 디렉토리 결정 (심볼릭 링크 해결) ─────────────────────────
+# --- 스크립트 소스 디렉토리 결정 (심볼릭 링크 해결) -------------------------
 resolve_script_dir() {
     local source="${BASH_SOURCE[0]}"
     while [[ -L "$source" ]]; do
@@ -39,7 +39,7 @@ readonly SCRIPT_DIR="$(resolve_script_dir)"
 # learnings.md 는 사용자 데이터가 축적되므로 덮어쓰지 않는다
 readonly PROTECTED_FILES=("learnings.md")
 
-# ─── 색상 ───────────────────────────────────────────────────────────────────
+# --- 색상 -------------------------------------------------------------------
 if [[ -t 1 ]] && command -v tput &>/dev/null && [[ "$(tput colors 2>/dev/null || echo 0)" -ge 8 ]]; then
     RED="$(tput setaf 1)"; GREEN="$(tput setaf 2)"; YELLOW="$(tput setaf 3)"
     CYAN="$(tput setaf 6)"; BOLD="$(tput bold)"; DIM="$(tput dim)"; RESET="$(tput sgr0)"
@@ -55,7 +55,7 @@ err()   { echo "  ${RED}[오류]${RESET} $*" >&2; }
 dry()   { echo "  ${CYAN}[미리보기]${RESET} $*"; }
 die()   { err "$@"; exit 1; }
 
-# ─── 전역 상태 ──────────────────────────────────────────────────────────────
+# --- 전역 상태 --------------------------------------------------------------
 TARGET_DIR=""
 INSTALL_KIRO=false
 INSTALL_CLAUDE=false
@@ -69,7 +69,7 @@ COUNT_SKIPPED=0
 COUNT_PROTECTED=0
 COUNT_DIR_CREATED=0
 
-# ─── Ctrl+C 핸들러 ──────────────────────────────────────────────────────────
+# --- Ctrl+C 핸들러 ----------------------------------------------------------
 cleanup() {
     echo ""
     warn "설치가 중단되었습니다."
@@ -78,7 +78,7 @@ cleanup() {
 }
 trap cleanup INT TERM
 
-# ─── 플랫폼 감지 ────────────────────────────────────────────────────────────
+# --- 플랫폼 감지 ------------------------------------------------------------
 detect_platform() {
     case "$(uname -s)" in
         Linux*)
@@ -94,7 +94,7 @@ detect_platform() {
     esac
 }
 
-# ─── 보호 파일 확인 ─────────────────────────────────────────────────────────
+# --- 보호 파일 확인 ---------------------------------------------------------
 is_protected() {
     local filename
     filename="$(basename "$1")"
@@ -104,7 +104,7 @@ is_protected() {
     return 1
 }
 
-# ─── 소스 파일 검증 ─────────────────────────────────────────────────────────
+# --- 소스 파일 검증 ---------------------------------------------------------
 validate_source() {
     local missing=()
 
@@ -141,7 +141,7 @@ validate_source() {
     fi
 }
 
-# ─── 대상 디렉토리 검증 ─────────────────────────────────────────────────────
+# --- 대상 디렉토리 검증 -----------------------------------------------------
 validate_target() {
     local candidate="$1"
 
@@ -157,7 +157,7 @@ validate_target() {
     TARGET_DIR="$candidate"
 }
 
-# ─── 자기 자신에게 설치 방지 ─────────────────────────────────────────────────
+# --- 자기 자신에게 설치 방지 -------------------------------------------------
 check_self_install() {
     local real_script real_target
     real_script="$(cd -P "$SCRIPT_DIR" && pwd)"
@@ -172,7 +172,7 @@ check_self_install() {
     fi
 }
 
-# ─── 프로젝트 디렉토리 휴리스틱 확인 ────────────────────────────────────────
+# --- 프로젝트 디렉토리 휴리스틱 확인 ----------------------------------------
 check_project_indicators() {
     local indicators=0
     for marker in .git package.json pyproject.toml Cargo.toml go.mod \
@@ -192,7 +192,7 @@ check_project_indicators() {
     fi
 }
 
-# ─── 디스크 공간 확인 ───────────────────────────────────────────────────────
+# --- 디스크 공간 확인 -------------------------------------------------------
 check_disk_space() {
     if command -v df &>/dev/null; then
         local avail_kb
@@ -203,7 +203,7 @@ check_disk_space() {
     fi
 }
 
-# ─── 디렉토리 생성 (멱등) ───────────────────────────────────────────────────
+# --- 디렉토리 생성 (멱등) ---------------------------------------------------
 ensure_dir() {
     local dir="$1"
     local rel="${dir#"$TARGET_DIR"/}"
@@ -219,7 +219,7 @@ ensure_dir() {
     COUNT_DIR_CREATED=$((COUNT_DIR_CREATED + 1))
 }
 
-# ─── 파일 복사 핵심 로직 ────────────────────────────────────────────────────
+# --- 파일 복사 핵심 로직 ----------------------------------------------------
 #
 # 처리 순서:
 #   1. 대상 디렉토리 확보
@@ -303,7 +303,7 @@ copy_file() {
     COUNT_COPIED=$((COUNT_COPIED + 1))
 }
 
-# ─── Kiro 설치 ──────────────────────────────────────────────────────────────
+# --- Kiro 설치 --------------------------------------------------------------
 install_kiro() {
     echo ""
     echo "  ${BOLD}-- Kiro 설정 파일 --${RESET}"
@@ -320,7 +320,7 @@ install_kiro() {
     copy_file "kiro/hooks/periodic-review.kiro.hook"    ".kiro/hooks/periodic-review.kiro.hook"
 }
 
-# ─── Claude Code 설치 ───────────────────────────────────────────────────────
+# --- Claude Code 설치 -------------------------------------------------------
 install_claude_code() {
     echo ""
     echo "  ${BOLD}-- Claude Code 설정 파일 --${RESET}"
@@ -330,7 +330,7 @@ install_claude_code() {
     copy_file "claude-code/learnings.md"    ".claude/learnings.md"
 }
 
-# ─── 대화형 메뉴 ────────────────────────────────────────────────────────────
+# --- 대화형 메뉴 ------------------------------------------------------------
 select_interactive() {
     echo ""
     echo "  ${BOLD}설치할 항목을 선택하세요:${RESET}"
@@ -352,7 +352,7 @@ select_interactive() {
     esac
 }
 
-# ─── .gitignore 힌트 ────────────────────────────────────────────────────────
+# --- .gitignore 힌트 --------------------------------------------------------
 suggest_gitignore() {
     local gitignore="$TARGET_DIR/.gitignore"
     [[ -f "$gitignore" ]] || return 0
@@ -379,7 +379,7 @@ suggest_gitignore() {
     fi
 }
 
-# ─── 결과 요약 ──────────────────────────────────────────────────────────────
+# --- 결과 요약 --------------------------------------------------------------
 print_summary() {
     echo ""
     echo "${BOLD}========================================${RESET}"
@@ -439,7 +439,7 @@ print_summary() {
     echo ""
 }
 
-# ─── 도움말 (English) ──────────────────────────────────────────────────────
+# --- 도움말 (English) ------------------------------------------------------
 show_help() {
     cat <<'EOF'
 Usage: install.sh [OPTIONS] [PROJECT_PATH]
@@ -493,7 +493,7 @@ FILES INSTALLED:
 EOF
 }
 
-# ─── 인자 파싱 ──────────────────────────────────────────────────────────────
+# --- 인자 파싱 --------------------------------------------------------------
 parse_args() {
     local positional_args=()
 
@@ -519,7 +519,7 @@ parse_args() {
     TARGET_DIR="${positional_args[0]:-$(pwd)}"
 }
 
-# ─── 메인 ───────────────────────────────────────────────────────────────────
+# --- 메인 -------------------------------------------------------------------
 main() {
     parse_args "$@"
 

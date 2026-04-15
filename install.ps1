@@ -1,4 +1,4 @@
-# =============================================================================
+﻿# =============================================================================
 # install.ps1 - Agentic Coding Guide 설치 스크립트 (PowerShell)
 #
 # 사용법:
@@ -34,7 +34,7 @@ $ErrorActionPreference = "Stop"
 
 $script:VERSION = "2.1.0"
 
-# ─── 색상 출력 헬퍼 ─────────────────────────────────────────────────────────
+# --- 색상 출력 헬퍼 ---------------------------------------------------------
 
 function Write-Info    { param([string]$Msg) Write-Host "  [정보] $Msg" -ForegroundColor Cyan }
 function Write-Ok      { param([string]$Msg) Write-Host "  [완료] $Msg" -ForegroundColor Green }
@@ -49,7 +49,7 @@ function Write-Fatal {
     exit 1
 }
 
-# ─── 전역 상태 ──────────────────────────────────────────────────────────────
+# --- 전역 상태 --------------------------------------------------------------
 
 $script:ScriptDir    = Split-Path -Parent $MyInvocation.MyCommand.Path
 $script:TargetDir    = ""
@@ -66,7 +66,7 @@ $script:CountDirCreated = 0
 # 보호 파일 목록 (사용자 데이터가 축적되므로 덮어쓰지 않음)
 $script:ProtectedFiles = @("learnings.md")
 
-# ─── 도움말 ─────────────────────────────────────────────────────────────────
+# --- 도움말 -----------------------------------------------------------------
 
 function Show-Help {
     Write-Host @"
@@ -122,7 +122,7 @@ FILES INSTALLED:
 "@
 }
 
-# ─── 보호 파일 확인 ─────────────────────────────────────────────────────────
+# --- 보호 파일 확인 ---------------------------------------------------------
 
 function Test-Protected {
     param([string]$FilePath)
@@ -130,7 +130,7 @@ function Test-Protected {
     return $script:ProtectedFiles -contains $fileName
 }
 
-# ─── 파일 내용 비교 ─────────────────────────────────────────────────────────
+# --- 파일 내용 비교 ---------------------------------------------------------
 
 function Test-FilesIdentical {
     param([string]$Path1, [string]$Path2)
@@ -144,7 +144,7 @@ function Test-FilesIdentical {
     return $hash1 -eq $hash2
 }
 
-# ─── 소스 파일 검증 ─────────────────────────────────────────────────────────
+# --- 소스 파일 검증 ---------------------------------------------------------
 
 function Test-SourceFiles {
     $missing = @()
@@ -188,7 +188,7 @@ function Test-SourceFiles {
     }
 }
 
-# ─── 대상 디렉토리 검증 ─────────────────────────────────────────────────────
+# --- 대상 디렉토리 검증 -----------------------------------------------------
 
 function Resolve-TargetDir {
     param([string]$Path)
@@ -216,7 +216,7 @@ function Resolve-TargetDir {
     $script:TargetDir = $dirPath
 }
 
-# ─── 자기 자신에게 설치 방지 ─────────────────────────────────────────────────
+# --- 자기 자신에게 설치 방지 -------------------------------------------------
 
 function Test-SelfInstall {
     $realScript = (Resolve-Path $script:ScriptDir).Path.TrimEnd('\', '/')
@@ -231,7 +231,7 @@ function Test-SelfInstall {
     }
 }
 
-# ─── 프로젝트 디렉토리 휴리스틱 확인 ────────────────────────────────────────
+# --- 프로젝트 디렉토리 휴리스틱 확인 ----------------------------------------
 
 function Test-ProjectIndicators {
     $markers = @(".git", "package.json", "pyproject.toml", "Cargo.toml",
@@ -257,7 +257,7 @@ function Test-ProjectIndicators {
     }
 }
 
-# ─── 디스크 공간 확인 ───────────────────────────────────────────────────────
+# --- 디스크 공간 확인 -------------------------------------------------------
 
 function Test-DiskSpace {
     try {
@@ -271,7 +271,7 @@ function Test-DiskSpace {
     }
 }
 
-# ─── 디렉토리 생성 (멱등) ───────────────────────────────────────────────────
+# --- 디렉토리 생성 (멱등) ---------------------------------------------------
 
 function Ensure-Directory {
     param([string]$DirPath)
@@ -292,7 +292,7 @@ function Ensure-Directory {
     $script:CountDirCreated++
 }
 
-# ─── 파일 복사 핵심 로직 ────────────────────────────────────────────────────
+# --- 파일 복사 핵심 로직 ----------------------------------------------------
 
 function Copy-ConfigFile {
     param(
@@ -375,7 +375,7 @@ function Copy-ConfigFile {
     $script:CountCopied++
 }
 
-# ─── Kiro 설치 ──────────────────────────────────────────────────────────────
+# --- Kiro 설치 --------------------------------------------------------------
 
 function Install-Kiro {
     Write-Host ""
@@ -393,7 +393,7 @@ function Install-Kiro {
     Copy-ConfigFile "kiro\hooks\periodic-review.kiro.hook"    ".kiro\hooks\periodic-review.kiro.hook"
 }
 
-# ─── Claude Code 설치 ───────────────────────────────────────────────────────
+# --- Claude Code 설치 -------------------------------------------------------
 
 function Install-ClaudeCode {
     Write-Host ""
@@ -404,7 +404,7 @@ function Install-ClaudeCode {
     Copy-ConfigFile "claude-code\learnings.md"    ".claude\learnings.md"
 }
 
-# ─── 대화형 메뉴 ────────────────────────────────────────────────────────────
+# --- 대화형 메뉴 ------------------------------------------------------------
 
 function Select-Interactive {
     Write-Host ""
@@ -427,7 +427,7 @@ function Select-Interactive {
     }
 }
 
-# ─── .gitignore 힌트 ────────────────────────────────────────────────────────
+# --- .gitignore 힌트 --------------------------------------------------------
 
 function Show-GitignoreHint {
     $gitignore = Join-Path $script:TargetDir ".gitignore"
@@ -459,7 +459,7 @@ function Show-GitignoreHint {
     }
 }
 
-# ─── 결과 요약 ──────────────────────────────────────────────────────────────
+# --- 결과 요약 --------------------------------------------------------------
 
 function Show-Summary {
     Write-Host ""
@@ -519,7 +519,7 @@ function Show-Summary {
     Write-Host ""
 }
 
-# ─── 메인 ───────────────────────────────────────────────────────────────────
+# --- 메인 -------------------------------------------------------------------
 
 function Main {
     # 도움말 / 버전
