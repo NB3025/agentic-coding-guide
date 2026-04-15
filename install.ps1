@@ -24,7 +24,7 @@ param(
     [switch]$DryRun,
     [switch]$Force,
     [switch]$Help,
-    [switch]$Version,
+    [switch]$ShowVersion,
     [Parameter(Position = 0)]
     [string]$ProjectPath
 )
@@ -32,7 +32,7 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
-$script:VERSION = "2.1.0"
+$script:AppVersion = "2.1.0"
 
 # --- 색상 출력 헬퍼 ---------------------------------------------------------
 
@@ -71,7 +71,7 @@ $script:ProtectedFiles = @("learnings.md")
 function Show-Help {
     Write-Host @"
 
-Agentic Coding Guide Installer v$($script:VERSION)
+Agentic Coding Guide Installer v$($script:AppVersion)
 
 Usage:
   .\install.ps1 [OPTIONS] [PROJECT_PATH]
@@ -83,7 +83,7 @@ OPTIONS:
   -DryRun        Preview what would be done without making changes
   -Force         Overwrite existing files without backup
   -Help          Show this help message
-  -Version       Show version
+  -ShowVersion   Show version
 
 ARGUMENTS:
   PROJECT_PATH   Target project directory (default: current directory)
@@ -524,7 +524,7 @@ function Show-Summary {
 function Main {
     # 도움말 / 버전
     if ($Help) { Show-Help; return }
-    if ($Version) { Write-Host "install.ps1 v$($script:VERSION)"; return }
+    if ($ShowVersion) { Write-Host "install.ps1 v$($script:AppVersion)"; return }
 
     # 플래그 반영
     if ($Kiro -or $All) { $script:InstallKiro = $true }
@@ -533,7 +533,7 @@ function Main {
     # 헤더
     Write-Host ""
     Write-Host "========================================" -ForegroundColor White
-    Write-Host " Agentic Coding Guide 설치 v$($script:VERSION)" -ForegroundColor White
+    Write-Host " Agentic Coding Guide 설치 v$($script:AppVersion)" -ForegroundColor White
     Write-Host "========================================" -ForegroundColor White
     Write-Host ""
 
