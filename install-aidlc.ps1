@@ -1,10 +1,8 @@
-﻿# =============================================================================
+﻿﻿# =============================================================================
 # install-aidlc.ps1 - AWS AIDLC Rules 설치 스크립트 (PowerShell)
 #
 # 사용법:
-#   .\install-aidlc.ps1 [프로젝트_경로]
-#
-# 프로젝트 경로를 생략하면 현재 디렉토리를 대상으로 함
+#   .\install-aidlc.ps1 <프로젝트_경로>
 # =============================================================================
 
 [CmdletBinding()]
@@ -35,9 +33,13 @@ function Write-Fatal {
 # --- 메인 -------------------------------------------------------------------
 
 function Main {
-    # 프로젝트 경로 결정
+    # 프로젝트 경로 필수
     if ([string]::IsNullOrWhiteSpace($ProjectPath)) {
-        $ProjectPath = Get-Location
+        Write-Err "프로젝트 경로를 지정해야 합니다."
+        Write-Host ""
+        Write-Host "  사용법: .\install-aidlc.ps1 <프로젝트_경로>"
+        Write-Host "  예:     .\install-aidlc.ps1 C:\path\to\my-project"
+        exit 1
     }
 
     $resolved = Resolve-Path -Path $ProjectPath -ErrorAction SilentlyContinue

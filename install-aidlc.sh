@@ -3,9 +3,7 @@
 # install-aidlc.sh - AWS AIDLC Rules 설치 스크립트
 #
 # 사용법:
-#   ./install-aidlc.sh [프로젝트_경로]
-#
-# 프로젝트 경로를 생략하면 현재 디렉토리를 대상으로 함
+#   ./install-aidlc.sh <프로젝트_경로>
 # =============================================================================
 
 set -euo pipefail
@@ -30,7 +28,15 @@ die()   { err "$@"; exit 1; }
 
 # --- 메인 -------------------------------------------------------------------
 main() {
-    local project_dir="${1:-$(pwd)}"
+    if [[ $# -eq 0 ]]; then
+        err "프로젝트 경로를 지정해야 합니다."
+        echo ""
+        echo "  사용법: $0 <프로젝트_경로>"
+        echo "  예:     $0 /path/to/my-project"
+        exit 1
+    fi
+
+    local project_dir="$1"
 
     # 절대 경로로 변환
     if [[ "$project_dir" != /* ]]; then
