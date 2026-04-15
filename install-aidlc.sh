@@ -3,7 +3,10 @@
 # install-aidlc.sh - AWS AIDLC Rules 설치 스크립트
 #
 # 사용법:
-#   ./install-aidlc.sh <프로젝트_경로>
+#   ./install-aidlc.sh [프로젝트_경로]
+#
+# 프로젝트 경로를 생략하면 ~/Documents/builders-program-0416 을 대상으로 함
+# aidlc-workflows 저장소는 ~/Documents/ 에 클론됨
 # =============================================================================
 
 set -euo pipefail
@@ -28,15 +31,8 @@ die()   { err "$@"; exit 1; }
 
 # --- 메인 -------------------------------------------------------------------
 main() {
-    if [[ $# -eq 0 ]]; then
-        err "프로젝트 경로를 지정해야 합니다."
-        echo ""
-        echo "  사용법: $0 <프로젝트_경로>"
-        echo "  예:     $0 /path/to/my-project"
-        exit 1
-    fi
-
-    local project_dir="$1"
+    local default_dir="${HOME}/Documents/builders-program-0416"
+    local project_dir="${1:-$default_dir}"
 
     # 절대 경로로 변환
     if [[ "$project_dir" != /* ]]; then
@@ -44,11 +40,15 @@ main() {
             || die "경로를 찾을 수 없습니다: $1"
     fi
 
-    [[ -d "$project_dir" ]] || die "디렉토리가 존재하지 않습니다: $project_dir"
+    # 프로젝트 디렉토리 없으면 생성
+    if [[ ! -d "$project_dir" ]]; then
+        info "프로젝트 디렉토리를 생성합니다: $project_dir"
+        mkdir -p "$project_dir" || die "디렉토리를 생성할 수 없습니다: $project_dir"
+    fi
 
-    local parent_dir
-    parent_dir="$(dirname "$project_dir")"
-    local clone_dir="${parent_dir}/${AIDLC_DIR_NAME}"
+    # 클론 위치: ~/Documents/
+    local docs_dir="${HOME}/Documents"
+    local clone_dir="${docs_dir}/${AIDLC_DIR_NAME}"
 
     # 헤더
     echo ""

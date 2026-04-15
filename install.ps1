@@ -10,7 +10,7 @@
 #   -Help          도움말 표시
 #   -ShowVersion   버전 표시
 #
-# 프로젝트 경로를 생략하면 현재 디렉토리를 대상으로 함
+# 프로젝트 경로를 생략하면 ~/Documents/builders-program-0416 을 대상으로 함
 # =============================================================================
 
 [CmdletBinding()]
@@ -75,7 +75,7 @@ OPTIONS:
   -ShowVersion   Show version
 
 ARGUMENTS:
-  PROJECT_PATH   Target project directory (default: current directory)
+  PROJECT_PATH   Target project directory (default: ~/Documents/builders-program-0416)
 
 CONFLICT HANDLING:
   - Default: backs up existing files as .backup, then replaces with new version
@@ -84,14 +84,14 @@ CONFLICT HANDLING:
   - learnings.md: NEVER overwritten (protected; accumulates user data)
 
 EXAMPLES:
-  # Install into current directory
+  # Install into default directory (~/Documents/builders-program-0416)
   .\install.ps1
 
   # Install into a specific project
   .\install.ps1 C:\projects\my-app
 
   # Preview only (no file changes)
-  .\install.ps1 -DryRun C:\projects\my-app
+  .\install.ps1 -DryRun
 
   # Overwrite without backup
   .\install.ps1 -Force C:\projects\my-app
@@ -449,7 +449,11 @@ function Main {
 
     # 대상 디렉토리 결정
     if ([string]::IsNullOrWhiteSpace($ProjectPath)) {
-        $ProjectPath = Get-Location
+        $ProjectPath = Join-Path ([Environment]::GetFolderPath("MyDocuments")) "builders-program-0416"
+    }
+    if (-not (Test-Path $ProjectPath)) {
+        Write-Info "프로젝트 디렉토리를 생성합니다: $ProjectPath"
+        New-Item -ItemType Directory -Path $ProjectPath -Force | Out-Null
     }
     Resolve-TargetDir $ProjectPath
 

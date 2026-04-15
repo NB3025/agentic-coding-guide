@@ -11,7 +11,7 @@
 #   --help, -h      도움말 표시
 #   --version, -v   버전 표시
 #
-# 프로젝트 경로를 생략하면 현재 디렉토리를 대상으로 함
+# 프로젝트 경로를 생략하면 ~/Documents/builders-program-0416 을 대상으로 함
 # =============================================================================
 
 set -euo pipefail
@@ -132,7 +132,10 @@ validate_target() {
             || die "경로를 찾을 수 없습니다: $1"
     fi
 
-    [[ -d "$candidate" ]] || die "디렉토리가 존재하지 않습니다: $candidate"
+    if [[ ! -d "$candidate" ]]; then
+        info "프로젝트 디렉토리를 생성합니다: $candidate"
+        mkdir -p "$candidate" || die "디렉토리를 생성할 수 없습니다: $candidate"
+    fi
     [[ -w "$candidate" ]] || die "쓰기 권한이 없습니다: $candidate"
 
     TARGET_DIR="$candidate"
@@ -378,7 +381,7 @@ OPTIONS:
   --version, -v   Show version
 
 ARGUMENTS:
-  PROJECT_PATH    Target project directory (default: current directory)
+  PROJECT_PATH    Target project directory (default: ~/Documents/builders-program-0416)
 
 CONFLICT HANDLING:
   - Default: backs up existing files as .backup, then replaces with new version
@@ -387,14 +390,14 @@ CONFLICT HANDLING:
   - learnings.md: NEVER overwritten (protected; accumulates user data)
 
 EXAMPLES:
-  # Install into current directory
-  cd /my/project && /path/to/install.sh
+  # Install into default directory (~/Documents/builders-program-0416)
+  ./install.sh
 
   # Install into a specific project
   ./install.sh /path/to/my-project
 
   # Preview only (no file changes)
-  ./install.sh --dry-run /path/to/my-project
+  ./install.sh --dry-run
 
   # Overwrite without backup
   ./install.sh --force /path/to/my-project
@@ -429,7 +432,8 @@ parse_args() {
         die "프로젝트 경로는 하나만 지정할 수 있습니다."
     fi
 
-    TARGET_DIR="${positional_args[0]:-$(pwd)}"
+    local default_dir="${HOME}/Documents/builders-program-0416"
+    TARGET_DIR="${positional_args[0]:-$default_dir}"
 }
 
 # --- 메인 -------------------------------------------------------------------

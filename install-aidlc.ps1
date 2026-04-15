@@ -1,8 +1,11 @@
-﻿﻿# =============================================================================
+﻿# =============================================================================
 # install-aidlc.ps1 - AWS AIDLC Rules 설치 스크립트 (PowerShell)
 #
 # 사용법:
-#   .\install-aidlc.ps1 <프로젝트_경로>
+#   .\install-aidlc.ps1 [프로젝트_경로]
+#
+# 프로젝트 경로를 생략하면 ~/Documents/builders-program-0416 을 대상으로 함
+# aidlc-workflows 저장소는 ~/Documents/ 에 클론됨
 # =============================================================================
 
 [CmdletBinding()]
@@ -33,13 +36,15 @@ function Write-Fatal {
 # --- 메인 -------------------------------------------------------------------
 
 function Main {
-    # 프로젝트 경로 필수
+    # 기본 경로: ~/Documents/builders-program-0416
     if ([string]::IsNullOrWhiteSpace($ProjectPath)) {
-        Write-Err "프로젝트 경로를 지정해야 합니다."
-        Write-Host ""
-        Write-Host "  사용법: .\install-aidlc.ps1 <프로젝트_경로>"
-        Write-Host "  예:     .\install-aidlc.ps1 C:\path\to\my-project"
-        exit 1
+        $ProjectPath = Join-Path ([Environment]::GetFolderPath("MyDocuments")) "builders-program-0416"
+    }
+
+    # 프로젝트 디렉토리 없으면 생성
+    if (-not (Test-Path $ProjectPath)) {
+        Write-Info "프로젝트 디렉토리를 생성합니다: $ProjectPath"
+        New-Item -ItemType Directory -Path $ProjectPath -Force | Out-Null
     }
 
     $resolved = Resolve-Path -Path $ProjectPath -ErrorAction SilentlyContinue
@@ -48,12 +53,9 @@ function Main {
     }
     $projectDir = $resolved.Path
 
-    if (-not (Test-Path $projectDir -PathType Container)) {
-        Write-Fatal "디렉토리가 존재하지 않습니다: $projectDir"
-    }
-
-    $parentDir = Split-Path -Parent $projectDir
-    $cloneDir = Join-Path $parentDir $script:AidlcDirName
+    # 클론 위치: ~/Documents/
+    $docsDir = [Environment]::GetFolderPath("MyDocuments")
+    $cloneDir = Join-Path $docsDir $script:AidlcDirName
 
     # 헤더
     Write-Host ""
