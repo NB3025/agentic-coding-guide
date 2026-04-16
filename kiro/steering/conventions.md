@@ -29,6 +29,9 @@
 - Bedrock Agent는 사용하지 않음
 - 대신 Strands-Agents SDK를 사용
 
+## 모델 선택
+- Claude Opus 4.6 혹은 Sonnet 4.6을 사용하세요
+
 ## 기술 스택 (#11 Stack Declaration)
 <!-- 프로젝트에 맞게 수정하세요 -->
 - Language: (여기에 작성)
