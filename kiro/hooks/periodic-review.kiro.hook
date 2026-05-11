@@ -8,6 +8,6 @@
   },
   "then": {
     "type": "askAgent",
-    "prompt": "사후 리뷰를 실행하라:\n\n## 1. 규칙 리뷰 (#3 반복 실수 → 규칙 추가)\n.kiro/steering/boundaries.md를 읽고:\n- 아직 유효한 규칙인가?\n- 단순화할 수 있는 규칙은?\n- 중복은?\n- 최근 반복된 실수 중 추가해야 할 것은?\n수정이 필요하면 직접 수정하라.\n\n## 2. 학습 정리 (learnings → boundaries 승격)\n.kiro/steering/learnings.md에서:\n- 3회 이상 반복된 패턴 → boundaries.md에 영구 추가\n- 승격된 항목은 learnings.md에서 제거\n- 60일 이상 경과 + 최근 참조 없는 항목 → 삭제\n\n## 3. Git 히스토리 정리 (#10)\n현재 브랜치의 커밋을 확인하고:\n- 의미 없는 연쇄 커밋이 있으면 squash 제안\n- 잘못된 커밋 메시지가 있으면 수정 제안\n실제 rebase는 제안만 하고 실행하지 말 것 — 사용자가 판단.\n\n리뷰 결과를 요약하여 보고하라."
+    "prompt": "사후 리뷰를 실행하라:\n\n## 1. 규칙 리뷰 (#3 반복 실수 → 규칙 추가)\n.kiro/steering/boundaries.md를 읽고:\n- 아직 유효한 규칙인가?\n- 단순화할 수 있는 규칙은?\n- 중복은?\n- 최근 반복된 실수 중 추가해야 할 것은?\n수정이 필요하면 직접 수정하라.\n\n## 2. 학습 정리 (learnings → boundaries / agent-principles 승격)\n.kiro/steering/learnings.md에서:\n- 3회 이상 반복된 행동 패턴 → boundaries.md에 영구 추가\n- 3회 이상 반복된 합리화 패턴 → agent-principles.md의 anti-rationalization 표에 추가\n- 승격된 항목은 learnings.md에서 제거\n- 60일 이상 경과 + 최근 참조 없는 항목 → 삭제\n\n## 3. Git 히스토리 정리 (#10)\n현재 브랜치의 커밋을 확인하고:\n- 의미 없는 연쇄 커밋이 있으면 squash 제안\n- 잘못된 커밋 메시지가 있으면 수정 제안\n실제 rebase는 제안만 하고 실행하지 말 것 — 사용자가 판단.\n\n리뷰 결과를 요약하여 보고하라."
   }
 }
